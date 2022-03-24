@@ -2,6 +2,16 @@
     "section1": {
         "files": [
             {
+                "url": "assets/images/bgMarbles.png",
+                "type": "image",
+                "key": "bgMarbles"
+            },
+            {
+                "url": "assets/images/infoPanel.png",
+                "type": "image",
+                "key": "infoPanel"
+            },
+            {
                 "url": "assets/images/plannet1.png",
                 "type": "image",
                 "key": "plannet1"
@@ -25,6 +35,11 @@
                 "url": "assets/images/plannet5.png",
                 "type": "image",
                 "key": "plannet5"
+            },
+            {
+                "url": "assets/images/settings.png",
+                "type": "image",
+                "key": "settings"
             },
             {
                 "url": "assets/images/square1.png",
