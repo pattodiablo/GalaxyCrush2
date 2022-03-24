@@ -1,0 +1,38 @@
+{
+    "section1": {
+        "files": [
+            {
+                "url": "assets/images/plannet1.png",
+                "type": "image",
+                "key": "plannet1"
+            },
+            {
+                "url": "assets/images/plannet2.png",
+                "type": "image",
+                "key": "plannet2"
+            },
+            {
+                "url": "assets/images/plannet3.png",
+                "type": "image",
+                "key": "plannet3"
+            },
+            {
+                "url": "assets/images/plannet4.png",
+                "type": "image",
+                "key": "plannet4"
+            },
+            {
+                "url": "assets/images/plannet5.png",
+                "type": "image",
+                "key": "plannet5"
+            }
+        ]
+    },
+    "meta": {
+        "app": "Phaser Editor 2D - Asset Pack Editor",
+        "contentType": "phasereditor2d.pack.core.AssetContentType",
+        "url": "https://phasereditor2d.com",
+        "version": 2,
+        "showAllFilesInBlocks": false
+    }
+}
