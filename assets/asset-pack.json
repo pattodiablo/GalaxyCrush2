@@ -25,6 +25,16 @@
                 "url": "assets/images/plannet5.png",
                 "type": "image",
                 "key": "plannet5"
+            },
+            {
+                "url": "assets/images/square1.png",
+                "type": "image",
+                "key": "square1"
+            },
+            {
+                "url": "assets/images/square2.png",
+                "type": "image",
+                "key": "square2"
             }
         ]
     },

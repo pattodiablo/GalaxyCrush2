@@ -42,13 +42,40 @@ class Level extends Phaser.Scene {
 		this.fieldInitYPoint =  window.innerHeight/2 - this.totalFieldSize/2;
 		this.fieldFinalXPoint = this.fieldInitXPoint + this.totalFieldSize;
 		this.fieldFinalYPoint = this.fieldInitYPoint + this.totalFieldSize;
-	
+		
+		this.drawBackgroundField();
 		this.drawField();
 	
 		
 
 		
 	}
+
+	drawBackgroundField(){
+		for (let i = 0; i < this.fieldSize; i++) {
+			for (let j = 0; j < this.fieldSize; j++) {
+
+				let token = this.add.sprite(i*this.tokenSize + this.fieldInitXPoint, j*this.tokenSize+ this.fieldInitYPoint, "square1");
+				if(this.isOdd(i)){
+					if(!this.isOdd(j)){
+						let token = this.add.sprite(i*this.tokenSize-32 + this.fieldInitXPoint, j*this.tokenSize+32+ this.fieldInitYPoint, "square2");
+					}
+					
+
+				}else{
+					if(this.isOdd(j)){
+						let token = this.add.sprite(i*this.tokenSize+32 + this.fieldInitXPoint, j*this.tokenSize+32+ this.fieldInitYPoint, "square2");
+					}
+					
+				}
+				token.setOrigin(0,0)
+			}
+
+		}
+
+	}
+
+	isOdd(num) { return num % 2;}
 
 	drawField(){
 		this.gameArray = [];
@@ -294,8 +321,16 @@ class Level extends Phaser.Scene {
             for(let j = 0; j < this.fieldSize; j ++){
                 if(this.removeMap[i][j] > 0){
                     destroyed ++;
-                    this.tweens.add({
-                        targets: this.gameArray[i][j].gemSprite,
+					var destroyGem = this.tweens.createTimeline();
+					destroyGem.add({
+						targets: this.gameArray[i][j].gemSprite,
+                        scale: 1.2,
+                        duration: 100,
+                      
+					});
+					destroyGem.add({
+						targets: this.gameArray[i][j].gemSprite,
+						scale: 1,
                         alpha: 0.1,
                         duration: 100,
                         callbackScope: this,
@@ -308,7 +343,11 @@ class Level extends Phaser.Scene {
                                 this.replenishField();
                             }
                         }
-                    });
+					});
+					
+					destroyGem.play();
+
+                 
                     this.gameArray[i][j].isEmpty = true;
                 }
             }
@@ -322,11 +361,24 @@ class Level extends Phaser.Scene {
                 if(!this.gameArray[i][j].isEmpty){
                     let fallTiles = this.holesBelow(i, j);
                     if(fallTiles > 0){
-                        this.tweens.add({
-                            targets: this.gameArray[i][j].gemSprite,
-                            y: this.gameArray[i][j].gemSprite.y + fallTiles * this.tokenSize,
-                            duration: 100 * fallTiles
-                        });
+
+
+						var fallGems = this.tweens.createTimeline();
+					fallGems.add({
+						targets: this.gameArray[i][j].gemSprite,
+						y: this.gameArray[i][j].gemSprite.y - 5,
+						duration: 20
+                      
+					});
+					fallGems.add({
+						targets: this.gameArray[i][j].gemSprite,
+						y: this.gameArray[i][j].gemSprite.y + fallTiles * this.tokenSize,
+						duration: 80 * fallTiles
+					});
+					
+					fallGems.play();
+
+                    
                         this.gameArray[i + fallTiles][j] = {
                             gemSprite: this.gameArray[i][j].gemSprite,
                             gemColor: this.gameArray[i][j].gemColor,
@@ -353,13 +405,21 @@ class Level extends Phaser.Scene {
                     this.gameArray[i][j].gemSprite.setTexture(randomColor);
                     this.gameArray[i][j].gemSprite.visible = true;
                     this.gameArray[i][j].gemSprite.x = this.tokenSize * j + this.tokenSize / 2 + this.fieldInitXPoint;
-                    this.gameArray[i][j].gemSprite.y = this.tokenSize / 2 - (emptySpots - i) * this.tokenSize ;
+                    this.gameArray[i][j].gemSprite.y = this.tokenSize / 2 - (emptySpots - i) * this.tokenSize + this.fieldInitYPoint ;
                     this.gameArray[i][j].gemSprite.alpha = 1;
                     this.gameArray[i][j].isEmpty = false;
-                    this.tweens.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        y: this.tokenSize * i + this.tokenSize / 2+ this.fieldInitYPoint,
-                        duration: 100 * emptySpots,
+
+
+					var fallGems = this.tweens.createTimeline();
+					fallGems.add({
+						targets: this.gameArray[i][j].gemSprite,
+                        y: this.tokenSize * i + this.tokenSize / 2 + this.fieldInitYPoint+5,
+                        duration: 80 * emptySpots,
+					});
+					fallGems.add({
+						targets: this.gameArray[i][j].gemSprite,
+                        y: this.tokenSize * i + this.tokenSize / 2 + this.fieldInitYPoint,
+                        duration: 20,
                         callbackScope: this,
                         onComplete: function(){
                             replenished --;
@@ -376,7 +436,12 @@ class Level extends Phaser.Scene {
                                 }
                             }
                         }
-                    });
+					});
+					
+					fallGems.play();
+
+
+                 
                 }
             }
         }
