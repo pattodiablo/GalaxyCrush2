@@ -29,14 +29,24 @@ class Level extends Phaser.Scene {
 
 		this.fieldSize=9;
 		this.tokenSize=64;
+		this.totalFieldSize = this.fieldSize*this.tokenSize;
 		this.canPick = true;
 		this.dragging = false;
 		this.selectedGem = null;
 		this.input.on("pointerdown", this.gemSelect, this);
         this.input.on("pointermove", this.startSwipe, this);
         this.input.on("pointerup", this.stopSwipe, this);
+		
+		
+		this.fieldInitXPoint =  window.innerWidth/2 - this.totalFieldSize/2;
+		this.fieldInitYPoint =  window.innerHeight/2 - this.totalFieldSize/2;
+		this.fieldFinalXPoint = this.fieldInitXPoint + this.totalFieldSize;
+		this.fieldFinalYPoint = this.fieldInitYPoint + this.totalFieldSize;
+	
 		this.drawField();
 	
+		
+
 		
 	}
 
@@ -48,8 +58,10 @@ class Level extends Phaser.Scene {
 			this.gameArray[i] = [];
 			for (let j = 0; j < this.fieldSize; j++) {
 			
-			
-				let token = this.add.sprite(this.tokenSize * j + this.tokenSize / 2, this.tokenSize * i + this.tokenSize / 2, "plannet1");
+				let xposition = this.tokenSize * j + this.tokenSize / 2 + this.fieldInitXPoint;
+				let yposition = this.tokenSize * i + this.tokenSize / 2 + this.fieldInitYPoint ;
+
+				let token = this.add.sprite(xposition, yposition, "plannet1");
             
 				this.tokenGroup.add(token);
 				do {
@@ -74,8 +86,21 @@ class Level extends Phaser.Scene {
 	gemSelect(pointer){
 		if(this.canPick){
 			this.dragging=true;
-			let row = Math.floor(pointer.y / this.tokenSize);
-            let col = Math.floor(pointer.x / this.tokenSize);
+
+		
+			
+			if(pointer.y>this.fieldInitYPoint && pointer.y<this.fieldFinalYPoint){
+				if(pointer.x>this.fieldInitXPoint && pointer.x<this.fieldFinalXPoint){
+					
+					let Yrelative = pointer.y - this.fieldInitYPoint;
+					var row = Math.floor(Yrelative/ this.tokenSize);
+			
+
+					let Xrelative = pointer.x - this.fieldInitXPoint;
+					var col = Math.floor(Xrelative/ this.tokenSize);
+				
+			
+			
 			let pickedGem = this.gemAt(row, col);
 			if(pickedGem != -1){
 				if(this.selectedGem == null){
@@ -90,28 +115,33 @@ class Level extends Phaser.Scene {
                         this.selectedGem = null;
                     }
 					else{
-                        if(this.areNext(pickedGem, this.selectedGem)){
-							
-                            this.selectedGem.gemSprite.setScale(1);
-                            this.swapGems(this.selectedGem, pickedGem, true);
-                        }
-                        else{
-							
-                            this.selectedGem.gemSprite.setScale(1);
-                            pickedGem.gemSprite.setScale(1.2);
-                            this.selectedGem = pickedGem;
-                        }
-                    }
-                  
-                }
+							if(this.areNext(pickedGem, this.selectedGem)){
+								
+								this.selectedGem.gemSprite.setScale(1);
+								this.swapGems(this.selectedGem, pickedGem, true);
+							}
+							else{
+								
+								this.selectedGem.gemSprite.setScale(1);
+								pickedGem.gemSprite.setScale(1.2);
+								this.selectedGem = pickedGem;
+									}
+							}
+						
+						}
 
+					}
+				
+				}
 			}
-			
 		}
+
+		
 	}
 	startSwipe(pointer){
 
 		if(this.dragging && this.selectedGem != null){
+			
             let deltaX = pointer.downX - pointer.x;
             let deltaY = pointer.downY - pointer.y;
             let deltaRow = 0;
@@ -169,8 +199,8 @@ class Level extends Phaser.Scene {
         let col = this.getGemCol(gem1);
         this.tweens.add({
             targets: this.gameArray[row][col].gemSprite,
-            x: col * this.tokenSize + this.tokenSize / 2,
-            y: row * this.tokenSize + this.tokenSize / 2,
+            x: col * this.tokenSize + this.tokenSize / 2+ this.fieldInitXPoint,
+            y: row * this.tokenSize + this.tokenSize / 2+ this.fieldInitYPoint,
             duration: 100,
             callbackScope: this,
             onComplete: function(){
@@ -322,13 +352,13 @@ class Level extends Phaser.Scene {
                     this.gameArray[i][j].gemSprite = this.poolArray.pop()
                     this.gameArray[i][j].gemSprite.setTexture(randomColor);
                     this.gameArray[i][j].gemSprite.visible = true;
-                    this.gameArray[i][j].gemSprite.x = this.tokenSize * j + this.tokenSize / 2;
-                    this.gameArray[i][j].gemSprite.y = this.tokenSize / 2 - (emptySpots - i) * this.tokenSize;
+                    this.gameArray[i][j].gemSprite.x = this.tokenSize * j + this.tokenSize / 2 + this.fieldInitXPoint;
+                    this.gameArray[i][j].gemSprite.y = this.tokenSize / 2 - (emptySpots - i) * this.tokenSize ;
                     this.gameArray[i][j].gemSprite.alpha = 1;
                     this.gameArray[i][j].isEmpty = false;
                     this.tweens.add({
                         targets: this.gameArray[i][j].gemSprite,
-                        y: this.tokenSize * i + this.tokenSize / 2,
+                        y: this.tokenSize * i + this.tokenSize / 2+ this.fieldInitYPoint,
                         duration: 100 * emptySpots,
                         callbackScope: this,
                         onComplete: function(){
@@ -421,11 +451,15 @@ class Level extends Phaser.Scene {
 	}
 
 	getGemRow(gem){
-	
-        return Math.floor(gem.gemSprite.y / this.tokenSize);
+		let Yrelative = gem.gemSprite.y - this.fieldInitYPoint;
+        return Math.floor(Yrelative/ this.tokenSize);
+
+		
     }
     getGemCol(gem){
-        return Math.floor(gem.gemSprite.x / this.tokenSize);
+
+		let Xrelative = gem.gemSprite.x - this.fieldInitXPoint;
+        return Math.floor(Xrelative/ this.tokenSize);
     }
 
 	/* END-USER-CODE */
