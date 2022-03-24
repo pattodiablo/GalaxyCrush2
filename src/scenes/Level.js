@@ -36,7 +36,7 @@ class Level extends Phaser.Scene {
         this.input.on("pointermove", this.startSwipe, this);
         this.input.on("pointerup", this.stopSwipe, this);
 		this.drawField();
-		
+	
 		
 	}
 
@@ -171,7 +171,7 @@ class Level extends Phaser.Scene {
             targets: this.gameArray[row][col].gemSprite,
             x: col * this.tokenSize + this.tokenSize / 2,
             y: row * this.tokenSize + this.tokenSize / 2,
-            duration: 200,
+            duration: 100,
             callbackScope: this,
             onComplete: function(){
                 this.swappingGems --;
@@ -266,8 +266,8 @@ class Level extends Phaser.Scene {
                     destroyed ++;
                     this.tweens.add({
                         targets: this.gameArray[i][j].gemSprite,
-                        alpha: 0.5,
-                        duration: 200,
+                        alpha: 0.1,
+                        duration: 100,
                         callbackScope: this,
                         onComplete: function(){
                             destroyed --;
