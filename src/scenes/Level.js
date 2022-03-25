@@ -45,26 +45,76 @@ class Level extends Phaser.Scene {
 		
 		this.drawBackgroundField();
 		this.drawField();
+		this.addPanels();
 	
 		
 
 		
 	}
 
+	addPanels(){
+		let infoPanel1 = this.add.sprite(  0, 0, "infoPanel");
+		let infoPanel2 = this.add.sprite(  0, 0, "infoPanel");
+		let settings = this.add.sprite(  0, 0, "settings");
+		let starIcon = this.add.sprite(  0, 0, "plannet1");
+
+		if(window.innerWidth>window.innerHeight){
+
+			infoPanel1.x=this.fieldInitXPoint-infoPanel1.width-10;
+			infoPanel1.y=this.fieldInitYPoint+infoPanel1.height;
+
+			starIcon.x=this.fieldInitXPoint-infoPanel1.width-50;
+			starIcon.y=this.fieldInitYPoint+infoPanel1.height;
+
+			infoPanel2.x=this.fieldInitXPoint-infoPanel1.width-10;
+			infoPanel2.y=this.fieldInitYPoint+3*infoPanel1.height;
+
+			settings.x=this.fieldInitXPoint-infoPanel1.width-10;
+			settings.y=this.fieldInitYPoint+3*infoPanel1.height+infoPanel1.height*2;
+
+
+		}else{
+
+			infoPanel1.x=this.fieldInitXPoint+infoPanel2.width/2;
+			infoPanel1.y=this.fieldInitYPoint-infoPanel1.height;
+
+			infoPanel2.x=this.fieldInitXPoint+infoPanel2.width+infoPanel2.width/1.5;
+			infoPanel2.y=this.fieldInitYPoint-infoPanel1.height;
+
+			settings.x=this.fieldInitXPoint+infoPanel2.width+infoPanel2.width*1.8;
+			settings.y=this.fieldInitYPoint-infoPanel1.height;
+
+		}
+	}
+
 	drawBackgroundField(){
+
+		let marbleBg = this.add.sprite(  window.innerWidth/2, window.innerHeight/2, "bgMarbles");
+			
+
+		let backSquare = this.add.graphics();
+
+		backSquare.fillStyle(0x464646, 0.5);
+	    backSquare.fillRoundedRect(this.fieldInitXPoint-32, this.fieldInitYPoint-32,this.totalFieldSize+64, this.totalFieldSize+64, 32);
+
+		let backSquare2 = this.add.graphics();
+		backSquare2.fillStyle(0xf1b07e, 1);
+	    backSquare2.fillRoundedRect(this.fieldInitXPoint-12, this.fieldInitYPoint-12,this.totalFieldSize+24, this.totalFieldSize+24, 10);
+
+
 		for (let i = 0; i < this.fieldSize; i++) {
 			for (let j = 0; j < this.fieldSize; j++) {
 
 				let token = this.add.sprite(i*this.tokenSize + this.fieldInitXPoint, j*this.tokenSize+ this.fieldInitYPoint, "square1");
+				
+				
 				if(this.isOdd(i)){
 					if(!this.isOdd(j)){
-						let token = this.add.sprite(i*this.tokenSize-32 + this.fieldInitXPoint, j*this.tokenSize+32+ this.fieldInitYPoint, "square2");
+						let token = this.add.sprite(i*this.tokenSize+this.tokenSize/2+ this.fieldInitXPoint, j*this.tokenSize+this.tokenSize/2+ this.fieldInitYPoint, "square2");
 					}
-					
-
 				}else{
 					if(this.isOdd(j)){
-						let token = this.add.sprite(i*this.tokenSize+32 + this.fieldInitXPoint, j*this.tokenSize+32+ this.fieldInitYPoint, "square2");
+						let token = this.add.sprite(i*this.tokenSize+this.tokenSize/2 + this.fieldInitXPoint, j*this.tokenSize+this.tokenSize/2+ this.fieldInitYPoint, "square2");
 					}
 					
 				}
