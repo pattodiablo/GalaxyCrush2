@@ -7,6 +7,20 @@
                 "key": "bgMarbles"
             },
             {
+                "url": [
+                    "assets/sounds/correct1.mp3"
+                ],
+                "type": "audio",
+                "key": "correct1"
+            },
+            {
+                "url": [
+                    "assets/sounds/error1.mp3"
+                ],
+                "type": "audio",
+                "key": "error1"
+            },
+            {
                 "url": "assets/images/infoPanel.png",
                 "type": "image",
                 "key": "infoPanel"
@@ -37,6 +51,13 @@
                 "key": "plannet5"
             },
             {
+                "url": [
+                    "assets/sounds/pop1.mp3"
+                ],
+                "type": "audio",
+                "key": "pop1"
+            },
+            {
                 "url": "assets/images/settings.png",
                 "type": "image",
                 "key": "settings"
@@ -50,6 +71,18 @@
                 "url": "assets/images/square2.png",
                 "type": "image",
                 "key": "square2"
+            },
+            {
+                "url": [
+                    "assets/sounds/swap.mp3"
+                ],
+                "type": "audio",
+                "key": "swap"
+            },
+            {
+                "url": "src/scenes/Level.js",
+                "type": "sceneFile",
+                "key": "Level"
             }
         ]
     },

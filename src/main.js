@@ -14,8 +14,13 @@ window.addEventListener('load', function () {
 		}
 	});
 	
+
+	game.fixedWidth=window.innerWidth;
+	game.fixedHeight=window.innerHeight;
+	
+	
 	game.scene.add("Preload", Preload);
-	game.scene.add("Level", Level);
+
 	game.scene.add("Boot", Boot, true);
 });
 
@@ -29,3 +34,13 @@ class Boot extends Phaser.Scene {
 	}
 }
 
+function loadFont(name, url) {
+    var newFont = new FontFace(name, `url(${url})`);
+    newFont.load().then(function (loaded) {
+        document.fonts.add(loaded);
+    }).catch(function (error) {
+        return error;
+    });
+}
+var encoded_url = encodeURI("../font/Roboto-Regular.ttf");
+loadFont("Roboto", encoded_url);
