@@ -27,20 +27,20 @@ class Level extends Phaser.Scene {
 		
 		this.editorCreate();
 
+        this.canPlay=true;
 		this.fieldSize=9;
-        this.fieldWidth=5;
-        this.fieldHeight=4;
+
 		this.tokenSize=64;
 		this.totalFieldSize = this.fieldSize*this.tokenSize;
-        this.totalHeight= this.fieldHeight*this.tokenSize;
-        this.totalWidth= this.fieldWidth*this.tokenSize;
+
+        this.initialTime =this.game.settings.gameData.InitialTime;
+   
 		this.canPick = true;
 		this.dragging = false;
 		this.selectedGem = null;
 		this.input.on("pointerdown", this.gemSelect, this);
         this.input.on("pointermove", this.startSwipe, this);
         this.input.on("pointerup", this.stopSwipe, this);
-		
         
         console.log(this.game.fixedWidth);
         console.log(this.game.fixedHeight);
@@ -53,7 +53,7 @@ class Level extends Phaser.Scene {
 		this.drawBackgroundField();
 		this.drawField();
 		this.addPanels();
-        this.showObjective()
+       // this.showObjective()
 	
         this.swapSound = this.sound.add('swap');
         this.error1 = this.sound.add('error1');
@@ -67,7 +67,7 @@ class Level extends Phaser.Scene {
 
 	}
 
-    showObjective(){
+    showText(){
         let backSquare = this.add.graphics();
 
 		backSquare.fillStyle(0x464646, 0.8);
@@ -166,25 +166,25 @@ class Level extends Phaser.Scene {
     }
 
 	addPanels(){
-		let infoPanel1 = this.add.sprite(  0, 0, "infoPanel");
+
+        let infoPanel1 = this.add.sprite(  0, 0, "infoPanel");
 		let infoPanel2 = this.add.sprite(  0, 0, "infoPanel");
 		//let settings = this.add.sprite(  0, 0, "settings");
 		let starIcon = this.add.sprite(  0, 0, "plannet1");
 
-		if(this.game.fixedWidth>this.game.fixedHeight){
+        infoPanel1.x=this.fieldInitXPoint-infoPanel1.width-10;
+        infoPanel1.y=this.fieldInitYPoint+infoPanel1.height;
 
-			infoPanel1.x=this.fieldInitXPoint-infoPanel1.width-10;
-			infoPanel1.y=this.fieldInitYPoint+infoPanel1.height;
+        starIcon.x=this.fieldInitXPoint-infoPanel1.width-50;
+        starIcon.y=this.fieldInitYPoint+infoPanel1.height;
 
-			starIcon.x=this.fieldInitXPoint-infoPanel1.width-50;
-			starIcon.y=this.fieldInitYPoint+infoPanel1.height;
+        infoPanel2.x=this.fieldInitXPoint-infoPanel1.width-10;
+        infoPanel2.y=this.fieldInitYPoint+3*infoPanel1.height;
+        
 
-			infoPanel2.x=this.fieldInitXPoint-infoPanel1.width-10;
-			infoPanel2.y=this.fieldInitYPoint+3*infoPanel1.height;
+        if(this.game.fixedWidth>this.game.fixedHeight){
 
-		//	settings.x=this.fieldInitXPoint-infoPanel1.width-10;
-		//	settings.y=this.fieldInitYPoint+3*infoPanel1.height+infoPanel1.height*2;
-
+		
             
             this.collectText = this.add.text(this.fieldInitXPoint-infoPanel1.width-80,this.fieldInitYPoint+infoPanel1.height-70, "Collect", {
                 fontFamily: '"Roboto"',
@@ -222,11 +222,6 @@ class Level extends Phaser.Scene {
 			infoPanel2.x=this.fieldInitXPoint+infoPanel2.width+infoPanel2.width/1.5;
 			infoPanel2.y=this.fieldInitYPoint-infoPanel1.height;
 
-		//	settings.x=this.fieldInitXPoint+infoPanel2.width+infoPanel2.width*1.8;
-		//	settings.y=this.fieldInitYPoint-infoPanel1.height;
-            
-
-
               
             this.collectText = this.add.text(this.fieldInitXPoint+infoPanel2.width/2-80,this.fieldInitYPoint-infoPanel1.height-70, "Collect", {
                 fontFamily: '"Roboto"',
@@ -250,10 +245,215 @@ class Level extends Phaser.Scene {
                 fontSize: '50px'
             })
 
+        }
 
-		}
+
+        if(this.game.settings.gameData.isTimerMode){
+
+            let infoPanel3 = this.add.sprite(  0, 0, "infoPanel");
+            infoPanel3.x=this.fieldFinalXPoint+infoPanel3.width;
+            infoPanel3.y=this.fieldInitYPoint+infoPanel3.height;
+
+             
+            this.timerText = this.add.text(this.fieldFinalXPoint+infoPanel1.width,this.fieldInitYPoint+infoPanel3.height, this.formatTime(this.initialTime), {
+                fontFamily: '"Roboto"',
+                fontSize: '40px'
+            })
+            this.timerText.setOrigin(0.5,0.5);
+            this.startTimer();
+
+            this.collectText.text="Collected";
+            this.movesText.text="Moves made";
+            this.collectObjective.text=0;
+            this.movesLeft.text=0;
+
+            if(this.game.fixedWidth<this.game.fixedHeight){
+                
+                infoPanel3.x = this.fieldFinalXPoint-60;
+                infoPanel3.y = this.fieldInitYPoint-105;
+                this.timerText.x=   infoPanel3.x;
+                this.timerText.y=   infoPanel3.y;
+                infoPanel1.x -= 30;
+                infoPanel2.x -= 30;
+                starIcon.x-= 30;
+                this.collectObjective.x-=30;
+                this.movesLeft.x-=30;
+                this.movesText.x-=30;
+                this.collectText.x-=30;
+               
+            }
+        }
+
 	}
 
+    startTimer(){
+
+        var flashyText = this.tweens.createTimeline();
+        flashyText.add({
+            targets: this.timerText,
+            scale: 1.2,
+            duration: 100,
+            repeat:2,
+            yoyo: true,
+                });         
+        flashyText.play();
+
+        this.clockTimer = this.time.addEvent({
+            delay: 1000,                // ms
+            callback: function(){
+                console.log("esto en timer")
+                this.initialTime--;
+                if(this.initialTime<=0){
+                    this.clockTimer.remove();
+                    this.results();
+                }
+            },
+            //args: [],
+            callbackScope: this,
+            loop: true
+        });
+
+   
+    }
+
+    results(){
+
+        if(this.game.settings.gameData.isTimerMode){
+
+            let collectedGems = this.collectObjective.text;
+            let totalMoves = this.movesLeft.text;
+            console.log(collectedGems);
+            console.log(totalMoves);
+            let totalScore=collectedGems*this.game.settings.gameData.gemsValue  - totalMoves*this.game.settings.gameData.movesValue;
+            this.canPick=false;
+        
+          
+            this.data.done({
+                prizesWon: [this.data.prizes.pick()],
+                score:totalScore
+            });
+          //  this.showResults(totalScore);
+
+        }else{
+
+            let collectedGems = this.collectObjective.text;
+         
+            this.data.done({
+                prizesWon: [this.data.prizes.pick()],
+                score:collectedGems
+            });
+
+        }
+    }
+
+
+
+    showResults(totalScore){
+        let backSquare = this.add.graphics();
+
+		backSquare.fillStyle(0x464646, 0.8);
+	    backSquare.fillRoundedRect(0, this.fieldInitYPoint-32,this.game.fixedWidth, this.totalFieldSize+64, 0);
+        backSquare.generateTexture('backSquare', this.game.fixedWidth, this.totalFieldSize*2);
+  
+        this.imageBG = this.add.image(0, 0, 'backSquare');
+        backSquare.destroy();
+        this.imageBG.y=-500;
+        this.imageBG.setOrigin(0,0);
+
+        var showUp = this.tweens.createTimeline();
+        showUp.add({
+            targets:  this.imageBG,
+            y: 0,
+            duration: 800,
+            ease: "Bounce"
+        
+                });
+                
+                
+         showUp.play();
+
+         this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, totalScore, {
+                fontFamily: '"Roboto"',
+                fontSize: '60px'
+            })
+            this.ObjectiveText.setOrigin(0.5,0.5);
+            this.ObjectiveText.setScale(0.1);
+
+            var showUpText = this.tweens.createTimeline();
+            showUpText.add({
+            targets:  this.ObjectiveText,
+            scale: 1,
+            duration: 800,
+            ease: "Bounce"
+        
+                });
+                
+                
+           showUpText.play();
+
+           var timer = this.time.addEvent({
+            delay: 2300,                // ms
+            callback: function(){
+
+
+                var showUpText = this.tweens.createTimeline();
+                showUpText.add({
+                targets:  this.ObjectiveText,
+                alpha: 0,
+                duration: 400,
+                ease: "Linear"
+            
+                    });
+                    
+                    
+               showUpText.play();
+
+               var showUp = this.tweens.createTimeline();
+               showUp.add({
+                   targets:  this.imageBG,
+                   alpha: 0,
+                   duration: 400,
+                   ease: "Linear"
+               
+                       });
+                       
+                       
+                showUp.play();
+
+
+            },
+            //args: [],
+            callbackScope: this,
+            loop: true
+        });
+
+
+    }
+    
+    
+
+    update(){
+        if(this.game.settings.gameData.isTimerMode){
+
+            this.timerFormated=this.formatTime(this.initialTime);
+            this.timerText.text= this.timerFormated;
+
+        }
+       
+    }
+
+    formatTime(seconds){
+		// Minutes
+		var minutes = Math.floor(seconds/60);
+		// Seconds
+		var partInSeconds = seconds%60;
+		// Adds left zeros to seconds
+		partInSeconds = partInSeconds.toString().padStart(2,'0');
+		// Returns formated time
+		return `${minutes}:${partInSeconds}`;
+	}
+
+    
 	drawBackgroundField(){
 
 		let marbleBg = this.add.sprite(  this.game.fixedWidth/2, this.game.fixedHeight/2, "bgMarbles");
@@ -330,11 +530,9 @@ class Level extends Phaser.Scene {
 	gemSelect(pointer){
 		if(this.canPick){
 			this.dragging=true;
-
-
 			
 			if(pointer.y>this.fieldInitYPoint && pointer.y<this.fieldFinalYPoint){
-				if(pointer.x>this.fieldInitXPoint && pointer.x<this.fieldFinalXPoint){
+				if(pointer.x>this.fieldInitXPoint && pointer.x<this.fieldFinalXPoint){ //si esta dentro del tablero
 					
 					let Yrelative = pointer.y - this.fieldInitYPoint;
 					var row = Math.floor(Yrelative/ this.tokenSize);
@@ -360,9 +558,9 @@ class Level extends Phaser.Scene {
                     }
 					else{
 							if(this.areNext(pickedGem, this.selectedGem)){
-								
+								console.log("are next")
 								this.selectedGem.gemSprite.setScale(1);
-                        
+                                this.dragging=false;
 								this.swapGems(this.selectedGem, pickedGem, true);
                                
 							}
@@ -485,16 +683,24 @@ class Level extends Phaser.Scene {
 
         this.swapSound.on('complete', function(){
 
-        //    this.correct1.play();
+           this.correct1.play();
         },this);
 
-        let movesLeft=Number(this.movesLeft.text);
-        movesLeft-=1;
-        if(movesLeft<=0){
-            movesLeft=0;
-            console.log("gameOver")
+        if(this.game.settings.gameData.isTimerMode){
+            this.movesLeft.text++;
+
+        }else{
+
+            let movesLeft=Number(this.movesLeft.text);
+            movesLeft-=1;
+            if(movesLeft<=0){
+                movesLeft=0;
+                this.canPick=false;
+               this.results();
+            }
+            this.movesLeft.text=movesLeft;
         }
-        this.movesLeft.text=movesLeft;
+       
     }
 	matchInBoard(){
         for(let i = 0; i < this.fieldSize; i ++){
@@ -572,13 +778,23 @@ class Level extends Phaser.Scene {
 
 
     handlePoints(){
-        let points = Number( this.collectObjective.text);
-        points-=3;
-        if(points<=0){
-            points=0;
-            console.log("you win")
+
+        if(this.game.settings.gameData.isTimerMode){
+            this.collectObjective.text++;
+
+        }else{
+            let points = Number( this.collectObjective.text);
+                    points-=3;
+                    if(points<=0){
+                        points=0;
+                        console.log("you win");
+                        this.canPick=false;
+                        this.results();
+                    }
+                    this.collectObjective.text=points;
+
         }
-        this.collectObjective.text=points;
+       
 
         var flashyText = this.tweens.createTimeline();
             flashyText.add({

@@ -16,7 +16,7 @@ class Main extends Phaser.Scene {
 
 	create() {
 	
-		console.log(window.devicePixelRatio)
+		console.log(this)
 		if(this.gameWidth!="undefined"){
 			this.game.fixedWidth=this.scale.gameSize.width;
 		}
@@ -50,3 +50,11 @@ function loadFont(name, url) {
 }
 var encoded_url = encodeURI("../GalaxyCrush2/font/Roboto-Regular.ttf");
 loadFont("Roboto", encoded_url);
+
+
+function addBackground(){
+
+	let gameDiv = document.getElementById("gameDiv");
+	gameDiv.style.backgroundColor = "#C84A49";
+}
+addBackground();

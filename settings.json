@@ -1,9 +1,15 @@
 {
   "gameData": {	
   "version": 1,
- 
-  "scaleMode ": "FIT",
-  "responsive": false,
+  "scaleMode": "fit",
+  "gameWidth": 1080,
+  "gameHeight": 920,
+  "isTimerMode":true,
+  "InitialTime": 10,
+  "gemsValue": 30,
+  "movesValue": 10,
+  
+  "responsive": true,
   "physics":{
     "arcade": {
       "debug": false				
