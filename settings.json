@@ -5,16 +5,12 @@
   "gameWidth": 1080,
   "gameHeight": 920,
   "isTimerMode":true,
-  "InitialTime": 10,
+  "InitialTime": 60,
   "gemsValue": 30,
   "movesValue": 10,
-  
   "responsive": true,
-  "physics":{
-    "arcade": {
-      "debug": false				
-    }	
-  }
+  "backgroundColor" : "#C84A49"
+  
   },
 
   

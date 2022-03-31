@@ -55,6 +55,7 @@ loadFont("Roboto", encoded_url);
 function addBackground(){
 
 	let gameDiv = document.getElementById("gameDiv");
-	gameDiv.style.backgroundColor = "#C84A49";
+	gameDiv.style.backgroundColor = this.LeadLiaisonGame.settings.gameData.backgroundColor;
+	
 }
 addBackground();
