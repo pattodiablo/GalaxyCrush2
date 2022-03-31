@@ -1,0 +1,113 @@
+{
+  "gameData": {	
+  "version": 1,
+  "scaleMode": "fit",
+  "gameWidth": 1080,
+  "gameHeight": 920,
+  "isTimerMode":true,
+  "InitialTime": 60,
+  "gemsValue": 30,
+  "movesValue": 10,
+  "responsive": true,
+  "backgroundColor" : "#C84A49"
+  
+  },
+
+  
+   "files": [
+    {
+        "url": "assets/images/bgMarbles.png",
+        "type": "image",
+        "key": "bgMarbles"
+    },
+    {
+        "url": [
+            "assets/sounds/correct1.mp3"
+        ],
+        "type": "audio",
+        "key": "correct1"
+    },
+    {
+        "url": [
+            "assets/sounds/error1.mp3"
+        ],
+        "type": "audio",
+        "key": "error1"
+    },
+    {
+        "url": "assets/images/infoPanel.png",
+        "type": "image",
+        "key": "infoPanel"
+    },
+    {
+        "url": "assets/images/plannet1.png",
+        "type": "image",
+        "key": "plannet1"
+    },
+    {
+        "url": "assets/images/plannet2.png",
+        "type": "image",
+        "key": "plannet2"
+    },
+    {
+        "url": "assets/images/plannet3.png",
+        "type": "image",
+        "key": "plannet3"
+    },
+    {
+        "url": "assets/images/plannet4.png",
+        "type": "image",
+        "key": "plannet4"
+    },
+    {
+        "url": "assets/images/plannet5.png",
+        "type": "image",
+        "key": "plannet5"
+    },
+    {
+        "url": [
+            "assets/sounds/pop1.mp3"
+        ],
+        "type": "audio",
+        "key": "pop1"
+    },
+    {
+        "url": "assets/images/settings.png",
+        "type": "image",
+        "key": "settings"
+    },
+    {
+        "url": "assets/images/square1.png",
+        "type": "image",
+        "key": "square1"
+    },
+    {
+        "url": "assets/images/square2.png",
+        "type": "image",
+        "key": "square2"
+    },
+    {
+        "url": [
+            "assets/sounds/swap.mp3"
+        ],
+        "type": "audio",
+        "key": "swap"
+    }
+],
+  "prizes": [
+    {
+      "name": "prize 1",
+      "key": "prize1",
+      "tint": "0xaaaaaa",
+      "quantity": 1,
+      "bigWin": true
+    }
+  ]
+
+
+
+
+
+
+
+}
