@@ -273,21 +273,7 @@ class Level extends Phaser.Scene {
             this.collectObjective.text=0;
             this.movesLeft.text=0;
 
-            if(this.game.fixedWidth<this.game.fixedHeight){
-                
-                infoPanel3.x = this.fieldFinalXPoint-60;
-                infoPanel3.y = this.fieldInitYPoint-105;
-                this.timerText.x=   infoPanel3.x;
-                this.timerText.y=   infoPanel3.y;
-                infoPanel1.x -= 30;
-                infoPanel2.x -= 30;
-                starIcon.x-= 30;
-                this.collectObjective.x-=30;
-                this.movesLeft.x-=30;
-                this.movesText.x-=30;
-                this.collectText.x-=30;
-               
-            }
+          
         }
 
 	}
