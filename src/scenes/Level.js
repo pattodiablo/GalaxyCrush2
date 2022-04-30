@@ -29,17 +29,16 @@ class Level extends Phaser.Scene {
 
         this.canPlay=true;
         this.isGameOver = false;
-		this.fieldSize=9;
-        this.linesMade=0;
+		this.fieldSize=this.game.settings.gameData.boardUnitsSize;
+        
         this.isplaying=false;
 
-		this.tokenSize=64;
+		this.tokenSize=this.game.settings.gameData.tokenSize;
 		this.totalFieldSize = this.fieldSize*this.tokenSize;
 
-        this.score=0;
+        this.score=this.game.settings.gameData.initialScore;
         this.timesNormalLines=0;
         this.starCollected=0;
-
 
         this.initialTime =this.game.settings.gameData.InitialTime;
    
@@ -69,8 +68,7 @@ class Level extends Phaser.Scene {
         this.pop1 = this.sound.add('pop1');
 		this.pop1.loop = false;
 
-        this.scale.scaleMode="FIT";
-        console.log(this.scale.scaleMode)
+   
     
 
 	}
@@ -236,7 +234,7 @@ class Level extends Phaser.Scene {
             this.scoreText.setOrigin(0.5,0.5)
 
 
-            this.liveScore = this.add.text( this.cameras.main.width-100,50, "0", {
+            this.liveScore = this.add.text( this.cameras.main.width-100,50, this.score, {
                 fontFamily: '"Roboto"',
                 fontSize: '40px'
             })
@@ -314,10 +312,8 @@ class Level extends Phaser.Scene {
        
         let normalLineValue = Math.round(this.game.settings.gameData.gemsValue/3);
    
-        let collectedGems = this.collectObjective.text;
-
         
-        this.liveScore.text=this.timesNormalLines*normalLineValue+this.starCollected*this.game.settings.gameData.gemsValue;
+        this.liveScore.text=this.score+this.timesNormalLines*normalLineValue+this.starCollected*this.game.settings.gameData.gemsValue;
     }
 
     results(){
@@ -451,11 +447,11 @@ class Level extends Phaser.Scene {
 
 		let backSquare = this.add.graphics();
 
-		backSquare.fillStyle(0x464646, 0.5);
+		backSquare.fillStyle(this.game.settings.gameData.backSquareFill, 0.5);
 	    backSquare.fillRoundedRect(this.fieldInitXPoint-32, this.fieldInitYPoint-32,this.totalFieldSize+64, this.totalFieldSize+64, 32);
 
 		let backSquare2 = this.add.graphics();
-		backSquare2.fillStyle(0xf1b07e, 1);
+		backSquare2.fillStyle(this.game.settings.gameData.backSquare2Fill, 1);
 	    backSquare2.fillRoundedRect(this.fieldInitXPoint-12, this.fieldInitYPoint-12,this.totalFieldSize+24, this.totalFieldSize+24, 10);
 
 
