@@ -2,26 +2,68 @@
   "gameData": {	
   "version": 1,
   "scaleMode": "fit",
-  "gameWidth": 1080,
-  "gameHeight": 920,
-  "boardUnitsSize":9,
+
+  "boardUnitsSize":6,
   "tokenSize": 64,
   "initialScore": 0,
-  "isTimerMode":true,
+  "isTimerMode":false,
   "isPartyMode":false,
   "backSquareFill":"0x464646",
   "backSquare2Fill":"0xf1b07e",
   "InitialTime": 90,
   "gemsValue": 30,
   "movesLeft":30,
+  "StarsObjective":1,
   "toke1Value":50,
   "toke2Value":40,
   "toke3Value":30,
   "toke4Value":20,
   "toke5Value":10,
-  
   "responsive": true,
-  "backgroundColor" : "#C84A49"
+  "useGameBackground": true,
+  "backgroundColor" : "#C84A49",
+ 
+  "ObjectiveText": {
+    "fontFamily": "Roboto",
+    "fontSize": 90,
+    "color": "#ffffff"
+  },
+  "collectText": {
+    "fontFamily": "Roboto",
+    "fontSize": 20,
+    "color": "#ffffff"
+  },
+  "collectObjective": {
+    "fontFamily": "Roboto",
+    "fontSize": 50,
+    "color": "#ffffff"
+  },
+  "movesText": {
+    "fontFamily": "Roboto",
+    "fontSize": 20,
+    "color": "#ffffff"
+  },
+  "movesLeftFont": {
+    "fontFamily": "Roboto",
+    "fontSize": 50,
+    "color": "#ffffff"
+  },
+  "scoreText": {
+    "fontFamily": "Roboto",
+    "fontSize": 20,
+    "color": "#ffffff"
+  },
+  "liveScore": {
+    "fontFamily": "Roboto",
+    "fontSize": 40,
+    "color": "#ffffff"
+  },
+  "timerText": {
+    "fontFamily": "Roboto",
+    "fontSize": 40,
+    "color": "#ffffff"
+  }
+  
   
   },
 

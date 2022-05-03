@@ -32,13 +32,21 @@ class Level extends Phaser.Scene {
 		this.fieldSize=this.game.settings.gameData.boardUnitsSize;
         
         this.isplaying=false;
+          
+        this.gameRatio= window.innerWidth /  window.innerHeight;
+        
+        if(this.gameRatio>1){
+            this.gameRatio=1;
+        }
+        console.log(this.gameRatio)
 
-		this.tokenSize=this.game.settings.gameData.tokenSize;
+		this.tokenSize=this.game.settings.gameData.tokenSize*this.gameRatio;
 		this.totalFieldSize = this.fieldSize*this.tokenSize;
 
         this.score=this.game.settings.gameData.initialScore;
         this.timesNormalLines=0;
         this.starCollected=0;
+        this.isGameOver=false;
 
         this.initialTime =this.game.settings.gameData.InitialTime;
    
@@ -49,8 +57,7 @@ class Level extends Phaser.Scene {
         this.input.on("pointermove", this.startSwipe, this);
         this.input.on("pointerup", this.stopSwipe, this);
         
-        console.log(this.game.fixedWidth);
-        console.log(this.game.fixedHeight);
+   
 
 		this.fieldInitXPoint =  this.game.fixedWidth/2 - this.totalFieldSize/2;
 		this.fieldInitYPoint =  this.game.fixedHeight/2 - this.totalFieldSize/2;
@@ -58,22 +65,24 @@ class Level extends Phaser.Scene {
 		this.fieldFinalYPoint = this.fieldInitYPoint + this.totalFieldSize;
 		
 		this.drawBackgroundField();
-		this.drawField();
 		this.addPanels();
-       // this.showObjective()
-	
+        this.showText()
+
         this.swapSound = this.sound.add('swap');
         this.error1 = this.sound.add('error1');
         this.correct1 = this.sound.add('correct1');
         this.pop1 = this.sound.add('pop1');
 		this.pop1.loop = false;
 
-   
+
     
 
 	}
 
+ 
+
     showText(){
+
         let backSquare = this.add.graphics();
 
 		backSquare.fillStyle(0x464646, 0.8);
@@ -95,11 +104,11 @@ class Level extends Phaser.Scene {
                 });
                 
                 
-         showUp.play();
+            showUp.play();
 
-         this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, "Collect 30 STARS to win", {
-                fontFamily: '"Roboto"',
-                fontSize: '60px'
+            this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, "Collect "+  this.collectObjective.text + " STARS to win", {
+                fontFamily: this.game.settings.gameData.ObjectiveText.fontFamily,
+                fontSize: this.game.settings.gameData.ObjectiveText.fontSize*this.gameRatio/2
             })
             this.ObjectiveText.setOrigin(0.5,0.5);
             this.ObjectiveText.setScale(0.1);
@@ -120,7 +129,8 @@ class Level extends Phaser.Scene {
             delay: 2300,                // ms
             callback: function(){
 
-
+                this.drawField();
+                this.startTimer();
                 var showUpText = this.tweens.createTimeline();
                 showUpText.add({
                 targets:  this.ObjectiveText,
@@ -139,17 +149,17 @@ class Level extends Phaser.Scene {
                    alpha: 0,
                    duration: 400,
                    ease: "Linear"
-               
+                    
                        });
                        
                        
                 showUp.play();
-
+                    
 
             },
             //args: [],
             callbackScope: this,
-            loop: true
+            loop: false
         });
 
 
@@ -175,50 +185,65 @@ class Level extends Phaser.Scene {
 
         let infoPanel1 = this.add.sprite(  0, 0, "infoPanel");
 		let infoPanel2 = this.add.sprite(  0, 0, "infoPanel");
+
+        infoPanel1.setScale(this.gameRatio,this.gameRatio);
+        infoPanel2.setScale(this.gameRatio,this.gameRatio);
   
 		//let settings = this.add.sprite(  0, 0, "settings");
 		let starIcon = this.add.sprite(  0, 0, "plannet1");
         starIcon.displayWidth=this.tokenSize;
         starIcon.displayHeight=this.tokenSize;
-        let fixer=25;
+        let fixer=-20;
 
        
-			infoPanel1.x=this.fieldInitXPoint+infoPanel2.width/2-fixer;
-			infoPanel1.y=this.fieldInitYPoint-infoPanel1.height+20;
+			infoPanel1.x=infoPanel2.width/2*this.gameRatio-fixer;
+			infoPanel1.y=infoPanel1.height/2;
 
-			starIcon.x=this.fieldInitXPoint+infoPanel2.width/2-50-fixer;
-			starIcon.y=this.fieldInitYPoint-infoPanel1.height+20;
+            if(this.gameRatio>1){
+                starIcon.x=infoPanel2.width/2-50-fixer-this.gameRatio*3;
+            }else{
+                starIcon.x=infoPanel2.width/2-50-fixer;
+            }
+			starIcon.y=infoPanel1.height/2;
             
-			infoPanel2.x=this.fieldInitXPoint+infoPanel2.width+infoPanel2.width/1.5-fixer;
-			infoPanel2.y=this.fieldInitYPoint-infoPanel1.height+20;
+			infoPanel2.x=infoPanel2.width*this.gameRatio+infoPanel2.width*this.gameRatio/1.5-fixer;
+			infoPanel2.y=infoPanel1.height/2;
               
-            this.collectText = this.add.text(this.fieldInitXPoint+infoPanel2.width/2-80-fixer,this.fieldInitYPoint-infoPanel1.height-50, "Collect", {
-                fontFamily: '"Roboto"',
-                fontSize: '20px'
+            this.collectText = this.add.text(infoPanel2.width/2*this.gameRatio-20-fixer,20, "Collect", {
+                fontFamily:  this.game.settings.gameData.collectText.fontFamily,
+                fontSize:  this.game.settings.gameData.collectText.fontSize*this.gameRatio,
+                color:this.game.settings.gameData.collectText.color
             })
+             this.collectText.visible=false;
 
 
-            this.collectObjective = this.add.text(this.fieldInitXPoint+infoPanel2.width/2+20-fixer,this.fieldInitYPoint-infoPanel1.height+20, "30", {
-                fontFamily: '"Roboto"',
-                fontSize: '50px'
+            this.collectObjective = this.add.text(infoPanel2.width/2*this.gameRatio+20-fixer,infoPanel1.height/2,this.game.settings.gameData.StarsObjective, {
+                fontFamily:  this.game.settings.gameData.collectObjective.fontFamily,
+                fontSize:  this.game.settings.gameData.collectObjective.fontSize*this.gameRatio,
+                color:this.game.settings.gameData.collectObjective.color
             })
+
             this.collectObjective.setOrigin(0.5,0.5);
 
-            this.movesText = this.add.text(this.fieldInitXPoint+infoPanel2.width/2+140-fixer,this.fieldInitYPoint-infoPanel1.height-50, "Moves", {
-                fontFamily: '"Roboto"',
-                fontSize: '20px'
+            this.movesText = this.add.text(infoPanel2.width*this.gameRatio/2+140-fixer*this.gameRatio,infoPanel1.height-50, "Moves", {
+                fontFamily:  this.game.settings.gameData.movesText.fontFamily,
+                fontSize:  this.game.settings.gameData.movesText.fontSize*this.gameRatio,
+                color:this.game.settings.gameData.movesText.color
             })
-            
+            this.movesText.visible=false;
+
             if(this.game.settings.gameData.isPartyMode){
-                this.movesLeft = this.add.text(this.fieldInitXPoint+infoPanel2.width/2+215-fixer,this.fieldInitYPoint-infoPanel1.height+20, "0", {
-                    fontFamily: '"Roboto"',
-                    fontSize: '50px'
+                this.movesLeft = this.add.text(infoPanel2.width*this.gameRatio/2+215*this.gameRatio-fixer,infoPanel1.height/2, "0", {
+                    fontFamily:  this.game.settings.gameData.movesLeftFont.fontFamily,
+                    fontSize:  this.game.settings.gameData.movesLeftFont.fontSize*this.gameRatio,
+                    color:this.game.settings.gameData.movesLeftFont.color
                 })
 
             }else{
-                this.movesLeft = this.add.text(this.fieldInitXPoint+infoPanel2.width/2+215-fixer,this.fieldInitYPoint-infoPanel1.height+20, this.game.settings.gameData.movesLeft, {
-                    fontFamily: '"Roboto"',
-                    fontSize: '50px'
+                this.movesLeft = this.add.text(infoPanel2.width*this.gameRatio/2+220*this.gameRatio-fixer,infoPanel1.height/2, this.game.settings.gameData.movesLeft, {
+                    fontFamily:  this.game.settings.gameData.movesLeftFont.fontFamily,
+                    fontSize:  this.game.settings.gameData.movesLeftFont.fontSize*this.gameRatio,
+                    color: this.game.settings.gameData.movesLeftFont.color
                 })
 
             }
@@ -228,16 +253,29 @@ class Level extends Phaser.Scene {
 
 
             this.scoreText = this.add.text( this.cameras.main.width-100,20, "score", {
-                fontFamily: '"Roboto"',
-                fontSize: '20px'
+                fontFamily:  this.game.settings.gameData.scoreText.fontFamily,
+                fontSize:  this.game.settings.gameData.scoreText.fontSize*this.gameRatio,
+                color: this.game.settings.gameData.scoreText.color
             })
             this.scoreText.setOrigin(0.5,0.5)
+            this.scoreText.visible=false
+           
+            if(this.gameRatio<1){
+                this.liveScore = this.add.text( this.cameras.main.centerX,this.fieldFinalYPoint+60, this.score, {
+                    fontFamily:  this.game.settings.gameData.liveScore.fontFamily,
+                    fontSize:  this.game.settings.gameData.liveScore.fontSize*this.gameRatio,
+                    color: this.game.settings.gameData.liveScore.color
+                })
 
+            }else{
 
-            this.liveScore = this.add.text( this.cameras.main.width-100,50, this.score, {
-                fontFamily: '"Roboto"',
-                fontSize: '40px'
-            })
+                this.liveScore = this.add.text( this.cameras.main.width-100,infoPanel1.height/2, this.score, {
+                    fontFamily:  this.game.settings.gameData.liveScore.fontFamily,
+                    fontSize:  this.game.settings.gameData.liveScore.fontSize*this.gameRatio,
+                    color: this.game.settings.gameData.liveScore.color
+                })
+            }
+          
             this.liveScore.setOrigin(0.5,0.5)
 
       
@@ -255,16 +293,17 @@ class Level extends Phaser.Scene {
         if(this.game.settings.gameData.isTimerMode){
 
             let infoPanel3 = this.add.sprite(  0, 0, "infoPanel");
-            infoPanel3.x=this.fieldInitXPoint+infoPanel2.width/2+440-fixer;
-            infoPanel3.y=this.fieldInitYPoint-infoPanel1.height+20;
+            infoPanel3.x=infoPanel2.width/2+440-fixer;
+            infoPanel3.y=infoPanel1.height/2;
 
              
-            this.timerText = this.add.text(this.fieldInitXPoint+infoPanel2.width/2+440-fixer,this.fieldInitYPoint-infoPanel1.height+20, this.formatTime(this.initialTime), {
-                fontFamily: '"Roboto"',
-                fontSize: '40px'
+            this.timerText = this.add.text(infoPanel2.width/2+440-fixer,infoPanel1.height/2, this.formatTime(this.initialTime), {
+                fontFamily:  this.game.settings.gameData.timerText.fontFamily,
+                fontSize:  this.game.settings.gameData.timerText.fontSize,
+                color: this.game.settings.gameData.timerText.color
             })
             this.timerText.setOrigin(0.5,0.5);
-            this.startTimer();
+          
 
             this.collectText.text="Collected";
             this.movesText.text="Moves";
@@ -291,7 +330,7 @@ class Level extends Phaser.Scene {
         this.clockTimer = this.time.addEvent({
             delay: 1000,                // ms
             callback: function(){
-                console.log("esto en timer")
+                
                 this.initialTime--;
                 if(this.initialTime<=0){
                     this.clockTimer.remove();
@@ -318,21 +357,26 @@ class Level extends Phaser.Scene {
 
     results(){
 
-        let finalScore = Number(this.liveScore.text);
-        console.log(finalScore)
-                    
-            this.data.done({
-                prizesWon: [this.data.prizes.pick()],
-                score:finalScore
-            });
-      
+
+   
+       let resultsSquare = this.add.graphics();
+
+       resultsSquare.fillStyle(this.game.settings.gameData.backSquareFill, 0.5);
+       resultsSquare.fillRoundedRect(this.fieldInitXPoint-32*this.gameRatio, this.fieldInitYPoint-32*this.gameRatio,this.totalFieldSize+64*this.gameRatio, this.totalFieldSize+64*this.gameRatio, 32*this.gameRatio);
+
 
            
     }
 
 
 
-    showResults(totalScore){
+    showResults(){
+
+        this.canPick=false;
+  
+        this.tokenGroup.children.entries.forEach(token => {
+            token.visible=false;
+        });
         let backSquare = this.add.graphics();
 
 		backSquare.fillStyle(0x464646, 0.8);
@@ -356,9 +400,19 @@ class Level extends Phaser.Scene {
                 
          showUp.play();
 
-         this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, totalScore, {
-                fontFamily: '"Roboto"',
-                fontSize: '60px'
+         this.gameOverText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2-100, "GENIAL", {
+            fontFamily:  this.game.settings.gameData.scoreText.fontFamily,
+            fontSize:  this.game.settings.gameData.scoreText.fontSize*2,
+            color: this.game.settings.gameData.scoreText.color
+            })
+            this.gameOverText.setOrigin(0.5,0.5);
+       
+
+         this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, "RECLAMA \nTU PREMIO", {
+            fontFamily:  this.game.settings.gameData.scoreText.fontFamily,
+            fontSize:  this.game.settings.gameData.scoreText.fontSize*2,
+            color: this.game.settings.gameData.scoreText.color,
+            align: 'center'
             })
             this.ObjectiveText.setOrigin(0.5,0.5);
             this.ObjectiveText.setScale(0.1);
@@ -375,41 +429,7 @@ class Level extends Phaser.Scene {
                 
            showUpText.play();
 
-           var timer = this.time.addEvent({
-            delay: 2300,                // ms
-            callback: function(){
-
-
-                var showUpText = this.tweens.createTimeline();
-                showUpText.add({
-                targets:  this.ObjectiveText,
-                alpha: 0,
-                duration: 400,
-                ease: "Linear"
             
-                    });
-                    
-                    
-               showUpText.play();
-
-               var showUp = this.tweens.createTimeline();
-               showUp.add({
-                   targets:  this.imageBG,
-                   alpha: 0,
-                   duration: 400,
-                   ease: "Linear"
-               
-                       });
-                       
-                       
-                showUp.play();
-
-
-            },
-            //args: [],
-            callbackScope: this,
-            loop: true
-        });
 
 
     }
@@ -442,13 +462,17 @@ class Level extends Phaser.Scene {
     
 	drawBackgroundField(){
 
-		let marbleBg = this.add.sprite(  this.game.fixedWidth/2, this.game.fixedHeight/2, "bgMarbles");
-			
+   
+        if(this.game.settings.gameData.useGameBackground){
+            let marbleBg = this.add.sprite(  this.game.fixedWidth/2, this.game.fixedHeight/2, "bgMarbles");
+
+        }
+	
 
 		let backSquare = this.add.graphics();
 
 		backSquare.fillStyle(this.game.settings.gameData.backSquareFill, 0.5);
-	    backSquare.fillRoundedRect(this.fieldInitXPoint-32, this.fieldInitYPoint-32,this.totalFieldSize+64, this.totalFieldSize+64, 32);
+	    backSquare.fillRoundedRect(this.fieldInitXPoint-32*this.gameRatio, this.fieldInitYPoint-32*this.gameRatio,this.totalFieldSize+64*this.gameRatio, this.totalFieldSize+64*this.gameRatio, 32*this.gameRatio);
 
 		let backSquare2 = this.add.graphics();
 		backSquare2.fillStyle(this.game.settings.gameData.backSquare2Fill, 1);
@@ -459,19 +483,22 @@ class Level extends Phaser.Scene {
 			for (let j = 0; j < this.fieldSize; j++) {
 
 				let token = this.add.sprite(i*this.tokenSize + this.fieldInitXPoint, j*this.tokenSize+ this.fieldInitYPoint, "square1");
-				
+                token.setScale(this.gameRatio,this.gameRatio)
 				
 				if(this.isOdd(i)){
 					if(!this.isOdd(j)){
 						let token = this.add.sprite(i*this.tokenSize+this.tokenSize/2+ this.fieldInitXPoint, j*this.tokenSize+this.tokenSize/2+ this.fieldInitYPoint, "square2");
-					}
+                        token.setScale(this.gameRatio,this.gameRatio)
+                    }
 				}else{
 					if(this.isOdd(j)){
 						let token = this.add.sprite(i*this.tokenSize+this.tokenSize/2 + this.fieldInitXPoint, j*this.tokenSize+this.tokenSize/2+ this.fieldInitYPoint, "square2");
-					}
+                        token.setScale(this.gameRatio,this.gameRatio)
+                    }
 					
 				}
 				token.setOrigin(0,0)
+             
 			}
 
 		}
@@ -492,14 +519,17 @@ class Level extends Phaser.Scene {
 				let yposition = this.tokenSize * i + this.tokenSize / 2 + this.fieldInitYPoint ;
 
 				let token = this.add.sprite(xposition, yposition, "plannet1");
-        
-                token.setScale(0.5);
+                token.displayWidth=this.tokenSize;
+                token.displayHeight=this.tokenSize;
+                //token.setScale(0.5);
                 
 
 				this.tokenGroup.add(token);
 				do {
 					let randomImageToken=this.getRandomToken();
 					token.setTexture(randomImageToken);
+                    token.displayWidth=this.tokenSize;
+                    token.displayHeight=this.tokenSize;
 					this.gameArray[i][j] = {
 					gemColor: randomImageToken,
 					gemSprite: token,
@@ -521,7 +551,7 @@ class Level extends Phaser.Scene {
         
 		if(this.canPick){
             this.isplaying=true;
-            console.log("isPlaygin " + this.isplaying);
+            
 			this.dragging=true;
 			
 			if(pointer.y>this.fieldInitYPoint && pointer.y<this.fieldFinalYPoint){
@@ -539,33 +569,47 @@ class Level extends Phaser.Scene {
 			let pickedGem = this.gemAt(row, col);
 			if(pickedGem != -1){
 				if(this.selectedGem == null){
-                   pickedGem.gemSprite.setScale(0.6);
+                   
+
+                   pickedGem.gemSprite.displayWidth=this.tokenSize+10;
+                   pickedGem.gemSprite.displayHeight=this.tokenSize+10;
+
+                   
 				   pickedGem.gemSprite.setDepth(1);
 				   this.selectedGem = pickedGem;
                 }
 				else{
                     if(this.areTheSame(pickedGem, this.selectedGem)){
 						
-                        this.selectedGem.gemSprite.setScale(0.5);
+                       
+                        this.selectedGem.gemSprite.displayWidth=this.tokenSize;
+                        this.selectedGem.gemSprite.displayHeight=this.tokenSize;
+     
                         this.selectedGem = null;
                         this.isplaying=false;
-                        console.log("is playing " + this.isplaying)
+                        
                     }
 					else{
 							if(this.areNext(pickedGem, this.selectedGem)){
-								console.log("are next")
-								this.selectedGem.gemSprite.setScale(0.5);
+								
+                                this.selectedGem.gemSprite.displayWidth=this.tokenSize;
+                                this.selectedGem.gemSprite.displayHeight=this.tokenSize;
+
                                 this.dragging=false;
 								this.swapGems(this.selectedGem, pickedGem, true);
                                
 							}
 							else{
+								   this.selectedGem.gemSprite.displayWidth=this.tokenSize;
+                                   this.selectedGem.gemSprite.displayHeight=this.tokenSize;
+
+                                   pickedGem.gemSprite.displayWidth=this.tokenSize+10;
+                                   pickedGem.gemSprite.displayHeight=this.tokenSize+10;
+
 								
-								this.selectedGem.gemSprite.setScale(0.5);
-								pickedGem.gemSprite.setScale(0.6);
 								this.selectedGem = pickedGem;
                                 this.isplaying=false;
-                                console.log("is playing " + this.isplaying)
+                                
 									}
 							}
                         
@@ -602,7 +646,10 @@ class Level extends Phaser.Scene {
             if(deltaRow + deltaCol != 0){
                 let pickedGem = this.gemAt(this.getGemRow(this.selectedGem) + deltaRow, this.getGemCol(this.selectedGem) + deltaCol);
                 if(pickedGem != -1){
-                    this.selectedGem.gemSprite.setScale(0.5);
+                  
+                    this.selectedGem.gemSprite.displayWidth=64;
+                    this.selectedGem.gemSprite.displayHeight=64;
+
                     this.swapGems(this.selectedGem, pickedGem, true);
                     this.dragging = false;
                 }
@@ -766,7 +813,7 @@ class Level extends Phaser.Scene {
                     if(colorStreak >= 3){
 
                     if(this.game.settings.gameData.isPartyMode){
-                            console.log("is party mode")
+                            
                             this.handlePointsPartyMode(currentColor);
                             this.correct1.play();
                     }else{
@@ -862,9 +909,10 @@ class Level extends Phaser.Scene {
                     if(points<=0){
                         points=0;
                         console.log("you win");
+
                         this.canPick=false;
                         this.isGameOver=true;
-                        this.results();
+                        this.showResults();
                     }
                     this.collectObjective.text=points;
 
@@ -886,68 +934,39 @@ class Level extends Phaser.Scene {
     }
 
 	destroyGems(){
-        let destroyed = 0;
-        for(let i = 0; i < this.fieldSize; i ++){
-            for(let j = 0; j < this.fieldSize; j ++){
-                if(this.removeMap[i][j] > 0){
-                  
-                    destroyed ++;
-                if(this.game.settings.gameData.isPartyMode){
 
-                    var destroyGem = this.tweens.createTimeline();
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        scale: 0.8,
-                        duration: 100,
-                    
-                    });
-                  
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        scale: 0.1,
-                        y:this.gameArray[i][j].gemSprite.y,
-                        duration: 30,
-                        scale: 0.5
-                    
-                    });
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        
-                        y:this.gameArray[i][j].gemSprite.y,
-                        alpha: 0.1,
-                        duration: 200,
-                        callbackScope: this,
-                        onComplete: function(){
-                            destroyed --;
-                            this.gameArray[i][j].gemSprite.visible = false;
-                            this.poolArray.push(this.gameArray[i][j].gemSprite);
-                            if(destroyed == 0){
-                                this.makeGemsFall();
-                                this.replenishField();
-                            }
-                        }
-                    });
-            
-                  destroyGem.play();
-
-
-
-
-                }else{
-
-                    if(this.gameArray[i][j].gemColor!="plannet1"){
+        if(!this.isGameOver){
+            let destroyed = 0;
+            for(let i = 0; i < this.fieldSize; i ++){
+                for(let j = 0; j < this.fieldSize; j ++){
+                    if(this.removeMap[i][j] > 0){
+                      
+                        destroyed ++;
+                    if(this.game.settings.gameData.isPartyMode){
+    
                         var destroyGem = this.tweens.createTimeline();
                         destroyGem.add({
                             targets: this.gameArray[i][j].gemSprite,
-                            scale: 0.6,
+                            width: this.tokenSize+30,
+                            height: this.tokenSize+30,
                             duration: 100,
+                        
+                        });
+                      
+                        destroyGem.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                            scale: 0.1,
+                            y:this.gameArray[i][j].gemSprite.y,
+                            duration: 30,
+                            scale: 0.5
                         
                         });
                         destroyGem.add({
                             targets: this.gameArray[i][j].gemSprite,
-                            scale: 0.5,
+                            
+                            y:this.gameArray[i][j].gemSprite.y,
                             alpha: 0.1,
-                            duration: 100,
+                            duration: 200,
                             callbackScope: this,
                             onComplete: function(){
                                 destroyed --;
@@ -960,112 +979,154 @@ class Level extends Phaser.Scene {
                             }
                         });
                 
-                destroyGem.play();
-
-                }else{
-
-                    var destroyGem = this.tweens.createTimeline();
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        scale: 0.8,
-                        duration: 100,
+                      destroyGem.play();
+    
+    
+    
+    
+                    }else{
+    
+                        if(this.gameArray[i][j].gemColor!="plannet1"){
+                            var destroyGem = this.tweens.createTimeline();
+                            destroyGem.add({
+                                targets: this.gameArray[i][j].gemSprite,
+                                width: this.tokenSize+20,
+                                height: this.tokenSize+20,
+                                duration: 100,
+                            
+                            });
+                            destroyGem.add({
+                                targets: this.gameArray[i][j].gemSprite,
+                                width: this.tokenSize,
+                                height: this.tokenSize,
+                                alpha: 0.1,
+                                duration: 100,
+                                callbackScope: this,
+                                onComplete: function(){
+                                    destroyed --;
+                                    this.gameArray[i][j].gemSprite.visible = false;
+                                    this.poolArray.push(this.gameArray[i][j].gemSprite);
+                                    if(destroyed == 0){
+                                        this.makeGemsFall();
+                                        this.replenishField();
+                                    }
+                                }
+                            });
                     
-                    });
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        angle:360,
-                        duration: 130,
-                    
-                    });
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                        y:this.gameArray[i][j].gemSprite.y,
-                        duration: 30,
-                        scale: 0.5
-                    
-                    });
-                    destroyGem.add({
-                        targets: this.gameArray[i][j].gemSprite,
-                  
-                        x:this.collectObjective.x,
-                        y:this.collectObjective.y,
-                        alpha: 0.1,
-                        duration: 400,
-                        callbackScope: this,
-                        onComplete: function(){
-                            destroyed --;
-                            this.gameArray[i][j].gemSprite.visible = false;
-                            this.poolArray.push(this.gameArray[i][j].gemSprite);
-                            if(destroyed == 0){
-                                this.makeGemsFall();
-                                this.replenishField();
+                    destroyGem.play();
+    
+                    }else{
+    
+                        var destroyGem = this.tweens.createTimeline();
+                        destroyGem.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                            width: this.tokenSize+30,
+                            height: this.tokenSize+30,
+                            duration: 100,
+                        
+                        });
+                        destroyGem.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                            angle:360,
+                            duration: 130,
+                        
+                        });
+                        destroyGem.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                            y:this.gameArray[i][j].gemSprite.y,
+                            duration: 30,
+                            width: this.tokenSize,
+                            height: this.tokenSize
+                        
+                        });
+                        destroyGem.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                      
+                            x:this.collectObjective.x,
+                            y:this.collectObjective.y,
+                            alpha: 0.1,
+                            duration: 400,
+                            callbackScope: this,
+                            onComplete: function(){
+                                destroyed --;
+                                this.gameArray[i][j].gemSprite.visible = false;
+                                this.poolArray.push(this.gameArray[i][j].gemSprite);
+                                if(destroyed == 0){
+                                    this.makeGemsFall();
+                                    this.replenishField();
+                                }
                             }
-                        }
-                    });
-            
-                  destroyGem.play();
-
-
-                }
-
-                }
+                        });
+                
+                      destroyGem.play();
+    
+    
+                    }
+    
+                    }
+                        
                     
-				
-                 
-                    this.gameArray[i][j].isEmpty = true;
-                }
-            }
-        }
-    }
-
-
-	makeGemsFall(){
-        for(let i = this.fieldSize - 2; i >= 0; i --){
-            for(let j = 0; j < this.fieldSize; j ++){
-                if(!this.gameArray[i][j].isEmpty){
-                    let fallTiles = this.holesBelow(i, j);
-                    if(fallTiles > 0){
-
-
-						var fallGems = this.tweens.createTimeline();
-					fallGems.add({
-						targets: this.gameArray[i][j].gemSprite,
-                      
-                        scaleY:0.6,
                      
-						y: this.gameArray[i][j].gemSprite.y - 10,
-						duration: 20
-                      
-					});
-
-                    fallGems.add({
-						targets: this.gameArray[i][j].gemSprite,
-                     
-						y: this.gameArray[i][j].gemSprite.y + fallTiles * this.tokenSize+10,
-						duration: 80 * fallTiles
-					});
-
-					fallGems.add({
-						targets: this.gameArray[i][j].gemSprite,
-                        alpha:1,
-                        scaleY:0.5,
-						y: this.gameArray[i][j].gemSprite.y + fallTiles * this.tokenSize,
-						duration: 20
-					});
-					
-					fallGems.play();
-
-                    
-                        this.gameArray[i + fallTiles][j] = {
-                            gemSprite: this.gameArray[i][j].gemSprite,
-                            gemColor: this.gameArray[i][j].gemColor,
-                            isEmpty: false
-                        }
                         this.gameArray[i][j].isEmpty = true;
                     }
                 }
             }
         }
+      
+    }
+
+
+	makeGemsFall(){
+
+        if(!this.isGameOver){
+            for(let i = this.fieldSize - 2; i >= 0; i --){
+                for(let j = 0; j < this.fieldSize; j ++){
+                    if(!this.gameArray[i][j].isEmpty){
+                        let fallTiles = this.holesBelow(i, j);
+                        if(fallTiles > 0){
+    
+    
+                            var fallGems = this.tweens.createTimeline();
+                        fallGems.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                          
+                            height:this.tokenSize+10,
+                         
+                            y: this.gameArray[i][j].gemSprite.y - 10,
+                            duration: 20
+                          
+                        });
+    
+                        fallGems.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                         
+                            y: this.gameArray[i][j].gemSprite.y + fallTiles * this.tokenSize+10,
+                            duration: 80 * fallTiles
+                        });
+    
+                        fallGems.add({
+                            targets: this.gameArray[i][j].gemSprite,
+                            alpha:1,
+                            height:this.tokenSize,
+                            y: this.gameArray[i][j].gemSprite.y + fallTiles * this.tokenSize,
+                            duration: 20
+                        });
+                        
+                        fallGems.play();
+    
+                        
+                            this.gameArray[i + fallTiles][j] = {
+                                gemSprite: this.gameArray[i][j].gemSprite,
+                                gemColor: this.gameArray[i][j].gemColor,
+                                isEmpty: false
+                            }
+                            this.gameArray[i][j].isEmpty = true;
+                        }
+                    }
+                }
+            }
+        }
+       
     }
 
 
@@ -1080,6 +1141,8 @@ class Level extends Phaser.Scene {
                     this.gameArray[i][j].gemColor = randomColor;
                     this.gameArray[i][j].gemSprite = this.poolArray.pop()
                     this.gameArray[i][j].gemSprite.setTexture(randomColor);
+                    this.gameArray[i][j].gemSprite.displayWidth=this.tokenSize;
+                    this.gameArray[i][j].gemSprite.displayHeight=this.tokenSize;
                     this.gameArray[i][j].gemSprite.visible = true;
                     this.gameArray[i][j].gemSprite.x = this.tokenSize * j + this.tokenSize / 2 + this.fieldInitXPoint;
                     this.gameArray[i][j].gemSprite.y = this.tokenSize / 2 - (emptySpots - i) * this.tokenSize + this.fieldInitYPoint ;
