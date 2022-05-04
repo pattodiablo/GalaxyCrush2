@@ -29,14 +29,19 @@ class Level extends Phaser.Scene {
 
         this.canPlay=true;
         this.isGameOver = false;
-		this.fieldSize=this.game.settings.gameData.boardUnitsSize;
+
+
         
         this.isplaying=false;
           
         this.gameRatio= window.innerWidth /  window.innerHeight;
+
         
         if(this.gameRatio>1){
             this.gameRatio=1;
+            this.fieldSize=this.game.settings.gameData.boardUnitsSize+3;
+        }else{
+            this.fieldSize=this.game.settings.gameData.boardUnitsSize;
         }
         console.log(this.gameRatio)
 
@@ -371,20 +376,42 @@ class Level extends Phaser.Scene {
 
 
     showResults(){
-
+        console.log("estoy en show results")
         this.canPick=false;
   
         this.tokenGroup.children.entries.forEach(token => {
             token.visible=false;
         });
+
+
+        let urlButton = this.add.graphics();
+        urlButton.fillStyle(0xf0522d, 1);
+	    urlButton.fillRoundedRect(0, 0,220, 60, 10);
+        urlButton.generateTexture('urlButton', 220, 60);
+       
+
         let backSquare = this.add.graphics();
 
 		backSquare.fillStyle(0x464646, 0.8);
 	    backSquare.fillRoundedRect(0, this.fieldInitYPoint-32,this.game.fixedWidth, this.totalFieldSize+64, 0);
         backSquare.generateTexture('backSquare', this.game.fixedWidth, this.totalFieldSize*2);
-  
+
+    
+
         this.imageBG = this.add.image(0, 0, 'backSquare');
         backSquare.destroy();
+
+        this.urlButton = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY+100, 'urlButton');
+        urlButton.destroy();
+        this.urlButton.setOrigin(0.5,0.5); 
+
+        this.urlButton .setInteractive()
+        .on('pointerdown', () => 
+        
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSc8KOzvlnjbQt7KVv_a5K6EggCgDL3fcn2erpoCH-ejJIFqJg/viewform', '_blank')
+        
+        );
+
         this.imageBG.y=-500;
         this.imageBG.setOrigin(0,0);
 
@@ -408,7 +435,7 @@ class Level extends Phaser.Scene {
             this.gameOverText.setOrigin(0.5,0.5);
        
 
-         this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, "RECLAMA \nTU PREMIO", {
+         this.ObjectiveText = this.add.text(this.game.fixedWidth/2, this.game.fixedHeight/2, "GRACIAS \nPOR JUGAR", {
             fontFamily:  this.game.settings.gameData.scoreText.fontFamily,
             fontSize:  this.game.settings.gameData.scoreText.fontSize*2,
             color: this.game.settings.gameData.scoreText.color,
@@ -416,6 +443,14 @@ class Level extends Phaser.Scene {
             })
             this.ObjectiveText.setOrigin(0.5,0.5);
             this.ObjectiveText.setScale(0.1);
+
+
+            this.incribeteText = this.add.text(this.urlButton.x, this.urlButton.y, "INSCRÍBETE", {
+                fontFamily:  this.game.settings.gameData.scoreText.fontFamily,
+                fontSize:  this.game.settings.gameData.scoreText.fontSize,
+                color: this.game.settings.gameData.scoreText.color
+            })
+                this.incribeteText.setOrigin(0.5,0.5);
 
             var showUpText = this.tweens.createTimeline();
             showUpText.add({
